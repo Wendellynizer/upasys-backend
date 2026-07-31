@@ -13,6 +13,7 @@ Route::post('/register', [AuthController::class, 'register']);
 
 Route::middleware('auth:sanctum')->group(function() {
 
+    Route::patch('/rental-units/{rentalUnit}/toggle-availability', [RentalUnitController::class, 'toggleAvailability']);
     Route::apiResource('/rental-units', RentalUnitController::class);
 
     Route::post('/logout', [AuthController::class, 'logout']);

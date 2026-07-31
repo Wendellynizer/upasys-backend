@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\RentalUnit\Requests;
+namespace App\Http\Requests\RentalUnitRequests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -24,9 +24,10 @@ class StoreRentalUnitRequest extends FormRequest
     {
         return [
             'unit_name' => ['required', 'string', 'max:255'],
-            'description' => ['string'],
-            'base_rent_amount' => ['required', 'decimal:2'],
-            'payment_frequency_id' => ['required', 'integer'],
+            'description' => ['nullable', 'string'],
+            'base_rent_amount' => ['required', 'numeric', 'decimal:0,2'],
+            'payment_frequency_id' => ['required', 'integer', 'exists:payment_frequencies,id'],
+            'is_available' => ['sometimes', 'boolean'],
         ];
     }
 }
