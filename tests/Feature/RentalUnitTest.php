@@ -1,21 +1,23 @@
 <?php
 
+use App\Http\Resources\RentalUnit\RentalUnitResource;
 use App\Models\PaymentFrequency;
 use App\Models\RentalUnit;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function() {
+beforeEach(function () {
     $user = User::factory()->create();
     Sanctum::actingAs($user);
 
     $this->seed();
 });
 
-test('can CREATE rental unit', function() {
+test('can CREATE rental unit', function () {
 
     $freq = PaymentFrequency::first();
 
@@ -36,7 +38,7 @@ test('can CREATE rental unit', function() {
     ]);
 });
 
-test('can CREATE rental_unit w/o description', function() {
+test('can CREATE rental_unit w/o description', function () {
     $freq = PaymentFrequency::first();
 
     $payload = [
@@ -55,10 +57,13 @@ test('can CREATE rental_unit w/o description', function() {
     ]);
 });
 
-test('can UDPATE rental unit', function() {
+test('can UDPATE rental unit', function () {
 
     $freq = PaymentFrequency::first();
-    $rentalUnit = RentalUnit::first();
+    $rentalUnit = RentalUnit::factory()->create([
+        'unit_owner_id' => Auth::user()->id,
+        'payment_frequency_id' => $freq->id,
+    ]);
 
     $updatedDetailsPayload = [
         'unit_name' => 'Rental ni Chris brown',
@@ -69,9 +74,59 @@ test('can UDPATE rental unit', function() {
 
     $response = $this->patchJson("/api/rental-units/{$rentalUnit->id}", $updatedDetailsPayload);
 
+    $rentalUnit->refresh();
+
     $response->assertStatus(200)
         ->assertJson([
-            'data' => $updatedDetailsPayload,
+            'data' => (new RentalUnitResource($rentalUnit))->resolve(),
             'message' => 'Updated successfully',
         ]);
+});
+
+test('can CREATE tenant', function () {
+    $freq = PaymentFrequency::first();
+    $rentalUnit = RentalUnit::factory()->create([
+        'unit_owner_id' => Auth::user()->id,
+        'payment_frequency_id' => $freq->id,
+    ]);
+
+    $input = [
+        'fullname' => 'Jason Tatum',
+        'contact_number' => '09123456789',
+        'email' => 'jisontitum@gmail.com',
+    ];
+
+    $response = $this->postJson("/api/rental-units/{$rentalUnit->id}/create-tenant", $input);
+
+    $response->assertStatus(201);
+
+    $this->assertDatabaseHas('rental_units', [
+        'is_available' => false
+    ]);
+});
+
+test('can CREATE tenant with downpayment', function () {
+    $freq = PaymentFrequency::first();
+    $rentalUnit = RentalUnit::factory()->create([
+        'unit_owner_id' => Auth::user()->id,
+        'payment_frequency_id' => $freq->id,
+    ]);
+
+    $input = [
+        'fullname' => 'Jason Tatum',
+        'contact_number' => '09123456789',
+        'email' => 'jisontitum@gmail.com',
+        'has_downpayment' => true,
+        'payment_amount' => '1000.00',
+        'date_paid' => now()
+    ];
+
+    $response = $this->postJson("/api/rental-units/{$rentalUnit->id}/create-tenant", $input);
+
+    $response->assertStatus(201);
+
+    $this->assertDatabaseHas('rental_units', [
+        'is_available' => false
+    ]);
+    $this->assertDatabaseCount('rental_payments', 1);
 });

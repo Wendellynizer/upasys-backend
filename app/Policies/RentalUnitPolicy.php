@@ -37,7 +37,7 @@ class RentalUnitPolicy
      */
     public function update(User $user, RentalUnit $rentalUnit): Response
     {
-        return $user->id === $rentalUnit->unit_owner_id
+        return ((int) $user->id) === ((int) $rentalUnit->unit_owner_id)
             ? Response::allow()
             : Response::deny("Not allowed.");
     }
@@ -47,7 +47,7 @@ class RentalUnitPolicy
      */
     public function delete(User $user, RentalUnit $rentalUnit): Response
     {
-        return $user->id === $rentalUnit->unit_owner_id
+        return ((int) $user->id) === ((int) $rentalUnit->unit_owner_id)
             ? Response::allow()
             : Response::deny("Not allowed.");
     }
@@ -69,7 +69,7 @@ class RentalUnitPolicy
     }
 
     public function addTenant(User $user, RentalUnit $rentalUnit) {
-        return $user->id === $rentalUnit->unit_owner_id
+        return ((int) $user->id) === ((int) $rentalUnit->unit_owner_id)
             ? Response::allow()
             : Response::deny("You are not the owner of the unit.");
     }

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class RentalUnit extends Model
@@ -19,5 +20,13 @@ class RentalUnit extends Model
 
     public function paymentFrequency(): HasOne {
         return $this->hasOne(PaymentFrequency::class);
+    }
+
+    public function tenant(): HasOne {
+        return $this->hasOne(Tenant::class);
+    }
+
+    public function rentalPayments(): HasMany {
+        return $this->hasMany(RentalPayment::class);
     }
 }
