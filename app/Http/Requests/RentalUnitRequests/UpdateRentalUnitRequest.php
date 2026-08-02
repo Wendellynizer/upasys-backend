@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\RentalUnit\Requests;
+namespace App\Http\Requests\RentalUnitRequests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -12,7 +12,7 @@ class UpdateRentalUnitRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+       return true;
     }
 
     /**
@@ -22,8 +22,12 @@ class UpdateRentalUnitRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
+         return [
+            'unit_name' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'base_rent_amount' => ['nullable', 'numeric', 'decimal:0,2'],
+            'payment_frequency_id' => ['nullable', 'integer', 'exists:payment_frequencies,id'],
+            'is_available' => ['sometimes', 'boolean'],
         ];
     }
 }

@@ -2,9 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\RentalUnit;
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -24,6 +27,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        Gate::define('update-rental-unit', function(User $user, RentalUnit $rentalUnit) {
+            return $rentalUnit->unit_owner_id === $user->id;
+        });
     }
 
     /**

@@ -13,10 +13,16 @@ class AuthController extends Controller
 {
     public function login(LoginRequest $request) {
 
+        if($request->user()) {
+            return response()->json([
+                'message' => 'You are already logged in'
+            ], 400);
+        }
+
         if(!Auth::attempt($request->validated())) {
             return response()->json([
                 'message' => 'Account not found.'
-            ]);
+            ], 401);
         }
         
         return new UserViewResource(Auth::user());

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\RentalUnit;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -17,6 +18,10 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
+        $this->call([
+            PaymentFrequencySeeder::class,
+        ]);
+
         User::factory()->create([
             'first_name' => 'Jhon',
             'last_name' => 'Doe',
@@ -24,5 +29,16 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
             'password' => 'test'
         ]);
+
+        User::factory()->create([
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+            'contact_number' => '09514135319',
+            'email' => 'test2@example.com',
+            'password' => 'test'
+        ]);
+
+
+        RentalUnit::factory(10)->create();
     }
 }
